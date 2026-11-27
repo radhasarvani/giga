@@ -2178,7 +2178,7 @@ limitations under the License.
           // Filter relevant ideas
           const relevant = {};
           processedIdeas.forEach(idea => {
-            if (idea.searchVolume.at(0) >= minSearchVolume) {
+            if (window.meetsMinSearchVolume(idea.searchVolume, minSearchVolume)) {
               relevant[idea.text] = idea.searchVolume;
             }
           });

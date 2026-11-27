@@ -398,4 +398,16 @@ The Google Ads keyword ideas are:
     });
     return rows;
   };
+
+  /**
+   * Checks whether a keyword's latest monthly search volume meets the minimum threshold.
+   */
+  window.meetsMinSearchVolume = (searchVolumes, minSearchVolume = 100) => {
+    if (!Array.isArray(searchVolumes) || searchVolumes.length === 0) {
+      return false;
+    }
+    return (
+      Number(searchVolumes[searchVolumes.length - 1] ?? 0) >= minSearchVolume
+    );
+  };
 </script>

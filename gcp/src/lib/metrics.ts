@@ -13,6 +13,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+export const DEFAULT_MIN_SEARCH_VOLUME = 100;
+
+export const meetsMinSearchVolume = (
+  searchVolumes: number[] | undefined,
+  minSearchVolume = DEFAULT_MIN_SEARCH_VOLUME,
+): boolean => {
+  if (!searchVolumes || searchVolumes.length === 0) {
+    return false;
+  }
+  return (
+    Number(searchVolumes[searchVolumes.length - 1] ?? 0) >= minSearchVolume
+  );
+};
+
 export const calculateGrowthMetrics = (searchVolumes: number[]) => {
   const latest = searchVolumes[searchVolumes.length - 1] || 0;
   const prevMonth = searchVolumes[searchVolumes.length - 2] || 0;

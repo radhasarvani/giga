@@ -23,6 +23,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 // Mocking backend calls
 const USER_EMAIL = 'mocked.user@example.com';
 
+import {meetsMinSearchVolume} from '../../lib/metrics';
 import * as serverActions from '../actions/giga-actions';
 
 // --- utils.html ---
@@ -1636,7 +1637,7 @@ const SettingsModal = ({
           <div>
             {infoModalOpen === 'min_search_volume' && (
               <p>
-                Keywords with an average monthly search volume below this
+                Keywords with a latest monthly search volume below this
                 threshold will be excluded from the analysis and clustering
                 process. This helps focus the tool on higher-volume terms and
                 reduces unnecessary API calls.
@@ -6436,7 +6437,7 @@ const GigaApp = ({onReset, isDemoMode}) => {
       // Filter relevant ideas
       const relevant = {};
       processedIdeas.forEach(idea => {
-        if (idea.searchVolume.at(0) >= minSearchVolume) {
+        if (meetsMinSearchVolume(idea.searchVolume, minSearchVolume)) {
           relevant[idea.text] = idea.searchVolume;
         }
       });

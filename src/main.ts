@@ -37,18 +37,43 @@ import {
 const MIN_SEARCH_VOLUME_THRESHOLD_FOR_LATEST_MONTH = 100;
 
 /**
+ * Checks whether a keyword's latest monthly search volume meets the minimum threshold.
+ *
+ * @param searchVolumes - Chronological array of monthly search volumes (oldest to latest).
+ * @param minSearchVolume - Minimum required search volume for the latest month.
+ * @returns True if the latest monthly search volume meets or exceeds the threshold.
+ */
+export const meetsMinSearchVolume = (
+  searchVolumes: number[] | undefined,
+  minSearchVolume = MIN_SEARCH_VOLUME_THRESHOLD_FOR_LATEST_MONTH
+): boolean => {
+  if (!searchVolumes || searchVolumes.length === 0) {
+    return false;
+  }
+  return (
+    Number(searchVolumes[searchVolumes.length - 1] ?? 0) >= minSearchVolume
+  );
+};
+
+/**
  * Converts keyword ideas to rows.
  *
  * @param ideas - An array of keyword ideas.
+ * @param minSearchVolume - Minimum latest-month search volume threshold.
  * @returns A list of rows representing the keyword ideas and their metrics.
  */
-export const convertIdeasToRows = ideas =>
+export const convertIdeasToRows = (
+  ideas,
+  minSearchVolume = MIN_SEARCH_VOLUME_THRESHOLD_FOR_LATEST_MONTH
+) =>
   ideas
-    .filter(
-      res =>
-        res.keywordIdeaMetrics?.monthlySearchVolumes?.[
-          res.keywordIdeaMetrics.monthlySearchVolumes.length - 1
-        ].monthlySearches > MIN_SEARCH_VOLUME_THRESHOLD_FOR_LATEST_MONTH
+    .filter(res =>
+      meetsMinSearchVolume(
+        res.keywordIdeaMetrics?.monthlySearchVolumes?.map(
+          m => m.monthlySearches
+        ),
+        minSearchVolume
+      )
     )
     .map(result => [
       result.text,
@@ -63,19 +88,21 @@ export const convertIdeasToRows = ideas =>
  * @param geoID - The location ID to target.
  * @param language - The language ID or name.
  * @param maxIdeas - The maximum number of ideas to retrieve.
+ * @param minSearchVolume - Minimum latest-month search volume threshold.
  * @returns A list of rows representing the keyword ideas and their metrics.
  */
 export const getIdeas = (
   keywords: string[],
   geoID: string,
   language: string,
-  maxIdeas: number
+  maxIdeas: number,
+  minSearchVolume = MIN_SEARCH_VOLUME_THRESHOLD_FOR_LATEST_MONTH
 ) => {
   const languageID = isNaN(Number(language))
     ? getLocationId(language)?.id
     : language;
   const ideas = generateKeywordIdeas(keywords, geoID, languageID, maxIdeas);
-  return convertIdeasToRows(ideas);
+  return convertIdeasToRows(ideas, minSearchVolume);
 };
 
 /**
